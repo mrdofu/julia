@@ -371,6 +371,13 @@ static void precompile_enq_all_specializations_(jl_methtable_t *mt, void *env)
 {
     jl_typemap_visitor(mt->defs, precompile_enq_all_specializations__, env);
     jl_typemap_visitor(mt->cache, precompile_enq_all_cache__, env);
+    jl_array_t *leafcache = mt->leafcache;
+    size_t i, l = jl_array_len(leafcache);
+    for (i = 1; i < l; i += 2) {
+        jl_value_t *l = jl_array_ptr_ref(leafcache, i);
+        if (l && l != jl_nothing)
+            precompile_enq_all_cache__((jl_typemap_entry_t*)l, env);
+    }
 }
 
 void jl_compile_now(jl_method_instance_t *mi);
